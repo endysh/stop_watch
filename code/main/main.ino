@@ -9,8 +9,6 @@
 #include <MD_MAX72xx.h>
 
 // Define the number of devices we have in the chain and the hardware interface
-// NOTE: These pin numbers will probably not work with your hardware and may
-// need to be adapted
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
 #define MAX_DEVICES 4
 
@@ -21,12 +19,6 @@
 #define BTN               A0
 #define IR_RECEIVE_PIN    A1
 
-//IR recievier object
-IRrecv IrReceiver(IR_RECEIVE_PIN);
-
-// SPI hardware interface
-MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
-
 // Text parameters
 #define CHAR_SPACING  2 // pixels between characters
 
@@ -34,8 +26,16 @@ MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 #define BUF_SIZE  75
 
 
+//IR recievier object
+IRrecv IrReceiver(IR_RECEIVE_PIN);
+
+// SPI hardware interface
+MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
+
 char message[BUF_SIZE] = "00:00";
-bool newMessageAvailable = true;
+
+uint8_t minutes = 0;
+uint8_t seconds = 0;
 
 
 void printText(uint8_t modStart, uint8_t modEnd, char *pMsg)
@@ -133,9 +133,6 @@ void setup()
   printText(0, MAX_DEVICES-1, " ");
   delay(500);
 }
-
-uint8_t minutes = 0;
-uint8_t seconds = 0;
 
 void loop()
 {
