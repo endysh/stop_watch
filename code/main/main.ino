@@ -5,6 +5,7 @@
 // User can enter text on the serial monitor and this will display as a
 // message on the display.
 
+#include <IRremote.h>
 #include <MD_MAX72xx.h>
 
 // Define the number of devices we have in the chain and the hardware interface
@@ -16,6 +17,7 @@
 #define CS_PIN    10  // or SS
 
 #define BTN               A0
+#define IR_RECEIVE_PIN    A1
 
 // Text parameters
 #define CHAR_SPACING  2 // pixels between characters
@@ -23,6 +25,8 @@
 // Global message buffers shared by Serial and Scrolling functions
 #define BUF_SIZE  75
 
+//IR recievier object
+IRrecv IrReceiver(IR_RECEIVE_PIN);
 
 // SPI hardware interface
 MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
@@ -120,6 +124,9 @@ void setup()
   
   pinMode(BTN, INPUT);
 
+  // Start the receiver
+  IrReceiver.enableIRIn();
+
   mx.begin();
   mx.control(0, MAX_DEVICES-1, MD_MAX72XX::INTENSITY, 0x0);
   printText(0, MAX_DEVICES-1, " ");
@@ -128,6 +135,8 @@ void setup()
 
 void loop()
 {
+//  IrReceiver.disableIRIn();
+  
   sprintf(message, "%02d:%02d", minutes, seconds++);
   if(seconds >= 60) {
     seconds = 0;
@@ -137,14 +146,22 @@ void loop()
   }
   printText(0, MAX_DEVICES-1, message);
 
+//  IrReceiver.enableIRIn();
+  
   for(int i=0; i<20; i++) {
     if(!digitalRead(BTN)) {
       seconds = 0;
       minutes = 0;
       break;
     }
+    
+    if(IrReceiver.decode()) {
+      Serial.println(IrReceiver.results.value, HEX);
+      IrReceiver.resume();
+    }
+
     delay(49);
   }
   
-  delay(15);
+  delay(10);
 }
