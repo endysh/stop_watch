@@ -115,13 +115,13 @@ void printText(uint8_t modStart, uint8_t modEnd, char *pMsg)
 
 void setup()
 {
+  Serial.begin(115200);
+  Serial.println("\nMD_MAX72XX StopWatch");
+  
   pinMode(BTN, INPUT);
 
   mx.begin();
   mx.control(0, MAX_DEVICES-1, MD_MAX72XX::INTENSITY, 0x0);
-
-  Serial.begin(115200);
-  Serial.println("\n[MD_MAX72XX Message Display]\nType a message for the display\nEnd message line with a newline");
   printText(0, MAX_DEVICES-1, " ");
   delay(500);
 }
